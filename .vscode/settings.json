@@ -1,0 +1,22 @@
+{
+    "python-envs.pythonProjects": [],
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "pricing_warehouse_local",
+            "database": "pricing_warehouse",
+            "username": "root",
+            "password": "Unihub2023!!",
+            "connectionTimeout": 30
+        }
+    ]
+}

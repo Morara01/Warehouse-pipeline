@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.env
+.venv/
+env/
+
+# Data
+data/raw/
+data/processed/
+
+# Logs
+logs/
+
+# OS
+.DS_Store
+
+# IDE .vscode/ .idea/
+.vscode/
+settings.json .idea/ *.iml # Jupyter Notebook .ipynb_checkpoints/
