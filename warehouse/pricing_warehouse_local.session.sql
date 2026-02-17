@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS dim_region (
     target_margin DECIMAL(5, 2)
 ) ENGINE=InnoDB;
 
+ALTER TABLE dim_region
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 -- DIMENSION: PRODUCT
 
 CREATE TABLE IF NOT EXISTS dim_product (
@@ -20,6 +23,9 @@ CREATE TABLE IF NOT EXISTS dim_product (
     price_tier VARCHAR(50),
     brand_strength_score INT
 ) ENGINE=InnoDB;
+
+ALTER TABLE dim_product
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 
 -- FACT TABLE: PRICING PERFORMANCE
@@ -48,6 +54,9 @@ CREATE TABLE IF NOT EXISTS fact_pricing_performance (
         FOREIGN KEY (region_id)
         REFERENCES dim_region (region_id)
 ) ENGINE=InnoDB;
+
+ALTER TABLE fact_pricing_performance
+ADD CONSTRAINT uq_product_region UNIQUE (product_id, region_id);
 
 SELECT * FROM dim_region;
 SELECT * FROM dim_product;

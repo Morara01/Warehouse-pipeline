@@ -16,5 +16,4 @@ logs/
 .DS_Store
 
 # IDE .vscode/ .idea/
-.vscode/
-settings.json .idea/ *.iml # Jupyter Notebook .ipynb_checkpoints/
+.vscode/{} settings.json

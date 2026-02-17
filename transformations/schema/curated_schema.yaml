@@ -1,0 +1,25 @@
+pricing_enriched_curated:
+  required_columns:
+    - product_id
+    - region
+    - base_cost
+    - recommended_selling_price
+    - mark_up_pct_used
+    - max_allowed_mark_uppct
+    - markup_compliant
+    - margin_vs_target
+    - category
+    - price_tier
+    - brand_strength_score
+    - target_revenue
+    - target_margin
+
+  column_types:
+    product_id: int
+    region: str
+    base_cost: float
+    recommended_selling_price: float
+    mark_up_pct_used: float
+    max_allowed_mark_uppct: float
+    markup_compliant: bool
+    margin_vs_target: float
