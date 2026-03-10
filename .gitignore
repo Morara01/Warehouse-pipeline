@@ -15,5 +15,5 @@ logs/
 # OS
 .DS_Store
 
-# IDE .vscode/ .idea/
+# vscode 
 .vscode/
