@@ -16,4 +16,4 @@ logs/
 .DS_Store
 
 # IDE .vscode/ .idea/
-.vscode/{} settings.json
+.vscode/
