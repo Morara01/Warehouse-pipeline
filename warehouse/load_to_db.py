@@ -164,8 +164,8 @@ def load_fact_pricing(engine, df):
         SELECT region_id, region_name
         FROM dim_region
     """
-    with engine.connect() as connection:
-        region_lookup = pd.read_sql(sql, connection)
+    with engine.connect() as conn:
+        region_lookup = pd.read_sql(sql, conn)
 
 
     region_lookup = pd.read_sql(

@@ -64,3 +64,4 @@ def run_excel_ingestion():
     logging.info("Starting Excel ingestion pipeline")
     ingest_excel_files(raw_path, processed_path)
     logging.info("Excel ingestion pipeline completed")
+    print("Excel ingestion running successfully")
