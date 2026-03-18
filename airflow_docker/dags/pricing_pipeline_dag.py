@@ -9,16 +9,21 @@ sys.path.append("/Users/george/Data_engineering_portfolio")
 
 # pipeline functions
 from project.ingestion.extract_excel import run_excel_ingestion
-from transformations.clean_data import run_cleaning_pipeline
-from transformations.enrich_data import run_enrichment_pipeline
-from quality.data_quality import run_data_quality_checks
-from warehouse.load_to_db import load_to_database
+from project.transformations.clean_data import run_cleaning_pipeline
+from project.transformations.enrich_data import run_enrichment_pipeline
+from project.quality.data_quality import run_data_quality_checks
+from project.warehouse.load_to_db import load_to_database
 
 default_args = {
     "owner": "george",
     "depends_on_past": False,
     "retries": 2,
     "retry_delay": timedelta(minutes=2),
+
+    # monitoring & alerting
+    "email": ["georgejustus254@gmail.com"],
+    "email_on_failure": True,
+    "email_on_retry": False,
 }
 
 with DAG(

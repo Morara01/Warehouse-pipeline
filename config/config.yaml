@@ -1,3 +1,4 @@
 paths:
-  raw_data: data/raw
-  processed_data: data/processed
+  raw_data: project/data/raw
+  processed_data: project/data/processed
+  curated_data: project/data/curated

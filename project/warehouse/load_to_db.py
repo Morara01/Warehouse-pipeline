@@ -2,8 +2,8 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from pathlib import Path
 from utils.logger import get_logger
-from transformations.schema.schema_validator import validate_schema
-from quality.data_quality import run_data_quality_checks
+from project.transformations.schema.schema_validator import validate_schema
+from project.quality.data_quality import run_data_quality_checks
 from utils.db import get_engine
 
 logger = get_logger("warehouse.load")
@@ -160,28 +160,24 @@ def load_dim_product(conn, df: pd.DataFrame):
 def load_fact_pricing(engine, df):
     logger.info("Preparing fact_pricing_performance incremental load")
 
-    sql = """
-        SELECT region_id, region_name
-        FROM dim_region
-    """
+    
     with engine.connect() as conn:
-        region_lookup = pd.read_sql(sql, conn)
+        result = conn.execute(text("SELECT region_id, region_name FROM dim_region"))
+        region_lookup = pd.DataFrame(result.fetchall(), columns=result.keys())
 
-
-    region_lookup = pd.read_sql(
-        "SELECT region_id, region_name FROM dim_region",
-        engine,
+    fact_df = df.merge(
+        region_lookup,
+        left_on="region",
+        right_on="region_name",
+        how="left"
     )
 
-    fact_df = (
-        df.merge(
-            region_lookup,
-            left_on="region",
-            right_on="region_name",
-            how="left",
-        )
-        .drop(columns=["region", "region_name"])
-    )
+    # Remove rows where region lookup failed
+    fact_df = fact_df.dropna(subset=["region_id"])
+
+    fact_df["region_id"] = fact_df["region_id"].astype(int)
+
+    fact_df = fact_df.drop(columns=["region", "region_name"])
 
     insert_sql = """
         INSERT INTO fact_pricing_performance (
@@ -213,23 +209,26 @@ def load_fact_pricing(engine, df):
 
     inserted = 0
 
-    for _, row in fact_df.iterrows():
-        result = engine.execute(
-            text(insert_sql),
-            {
-                "product_id": int(row["product_id"]),
-                "region_id": int(row["region_id"]),
-                "base_cost": float(row["base_cost"]),
-                "recommended_selling_price": float(row["recommended_selling_price"]),
-                "mark_up_pct_used": float(row["mark_up_pct_used"]),
-                "max_allowed_mark_uppct": float(row["max_allowed_mark_uppct"]),
-                "markup_compliant": bool(row["markup_compliant"]),
-                "margin_vs_target": float(row["margin_vs_target"]),
-            },
-        )
+    with engine.begin() as conn:
 
-        if result.rowcount == 1:
-            inserted += 1
+        for _, row in fact_df.iterrows():
+
+            result = conn.execute(
+                text(insert_sql),
+                {
+                    "product_id": int(row["product_id"]),
+                    "region_id": int(row["region_id"]),
+                    "base_cost": float(row["base_cost"]),
+                    "recommended_selling_price": float(row["recommended_selling_price"]),
+                    "mark_up_pct_used": float(row["mark_up_pct_used"]),
+                    "max_allowed_mark_uppct": float(row["max_allowed_mark_uppct"]),
+                    "markup_compliant": bool(row["markup_compliant"]),
+                    "margin_vs_target": float(row["margin_vs_target"]),
+                },
+            )
+
+            if result.rowcount == 1:
+                inserted += 1
 
     logger.info(f"Inserted {inserted} new fact records")
 
@@ -255,9 +254,9 @@ def load_to_database():
 
     # SCHEMA GUARDRAIL
     validate_schema(
-        df=df,
+        df,
         dataset_name="pricing_enriched_curated",
-        schema_path="transformations/schema/curated_schema.yaml",
+        schema_relative_path="project/transformations/schema/curated_schema.yaml",
     )
 
     logger.info("Schema validation passed")

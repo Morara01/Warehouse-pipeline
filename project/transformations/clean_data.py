@@ -2,7 +2,7 @@ import os
 import logging
 import pandas as pd
 import yaml
-
+import re
 
 
 # Logging Configuration
@@ -49,14 +49,39 @@ def apply_business_rules(df: pd.DataFrame, pricing_rules: dict) -> pd.DataFrame:
     return df
 
 
+def get_latest_ingested_files(processed_path):
+    latest_files = {}
+
+    for file_name in os.listdir(processed_path):
+
+        if not (file_name.endswith(".csv") and "ingested" in file_name):
+            continue
+
+        # Example: merged_pricing_data8_ingested
+        dataset = file_name.split("_ingested_")[0]
+
+        match = re.search(r"\d{14}", file_name)
+        if not match:
+            continue
+
+        timestamp = match.group()
+
+        if dataset not in latest_files:
+            latest_files[dataset] = (timestamp, file_name)
+        else:
+            if timestamp > latest_files[dataset][0]:
+                latest_files[dataset] = (timestamp, file_name)
+
+    return [file[1] for file in latest_files.values()]
 
 # Cleaning Pipeline
 
 def clean_files(processed_path: str, cleaned_path: str, pricing_rules: dict):
     os.makedirs(cleaned_path, exist_ok=True)
 
-    for file_name in os.listdir(processed_path):
-        if file_name.endswith(".csv") and "ingested" in file_name:
+    latest_files = get_latest_ingested_files(processed_path)
+    
+    for file_name in latest_files:
             try:
                 file_path = os.path.join(processed_path, file_name)
                 logging.info(f"Cleaning file: {file_name}")

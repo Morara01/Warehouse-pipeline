@@ -11,12 +11,13 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
     AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
-    PYTHONPATH: /opt/airflow/project
+    PYTHONPATH: /opt/airflow/repo
   volumes:
+    - ../:/opt/airflow/repo
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - ./project:/opt/airflow/project
+
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     postgres:
